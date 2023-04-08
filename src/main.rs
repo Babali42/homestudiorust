@@ -19,9 +19,7 @@ impl SoundCard {
     pub(crate) fn plug(&mut self, guitar: Guitar) {
         self.instrument = Some(guitar);
     }
-}
 
-impl SoundCard {
     pub(crate) fn isGuitarPlugged(&self) -> bool {
         self.instrument.is_some()
     }
@@ -37,7 +35,7 @@ impl Studio {
     }
 
     pub(crate) fn makeSound(&self) -> bool {
-        false
+        self.isSoundcardPlugged() && self.soundcard.unwrap().isGuitarPlugged()
     }
 }
 
@@ -64,3 +62,11 @@ fn should_plug_sound_card_to_studio() {
     assert!(!studio.makeSound());
 }
 
+#[test]
+fn should_plug_guitar_and_soundcard_and_make_sound() {
+    let mut studio = Studio { soundcard: None };
+    let mut sound_card = SoundCard { instrument: None };
+    sound_card.plug(Guitar());
+    studio.plug(sound_card);
+    assert!(studio.makeSound());
+}
