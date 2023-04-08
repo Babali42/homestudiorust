@@ -3,18 +3,37 @@ fn main() {
 }
 
 struct Studio {
+    soundcard: Option<SoundCard>,
+}
+
+#[derive(Copy, Clone)]
+struct Guitar();
+
+
+#[derive(Copy, Clone)]
+struct SoundCard {
     instrument: Option<Guitar>,
 }
 
-struct Guitar();
+impl SoundCard {
+    pub(crate) fn plug(&mut self, guitar: Guitar) {
+        self.instrument = Some(guitar);
+    }
+}
 
-impl Studio {
+impl SoundCard {
     pub(crate) fn isGuitarPlugged(&self) -> bool {
         self.instrument.is_some()
     }
+}
 
-    pub(crate) fn plug(&mut self, guitar: Guitar) {
-        self.instrument = Some(guitar);
+impl Studio {
+    pub(crate) fn isSoundcardPlugged(&self) -> bool {
+        self.soundcard.is_some()
+    }
+
+    pub(crate) fn plug(&mut self, soundcard: SoundCard) {
+        self.soundcard = Some(soundcard);
     }
 
     pub(crate) fn makeSound(&self) -> bool {
@@ -24,15 +43,24 @@ impl Studio {
 
 #[test]
 fn should_make_no_sound_when_nothing() {
-    let studio = Studio { instrument: None };
+    let studio = Studio { soundcard: None };
     assert_eq!(false, studio.makeSound());
 }
 
+
 #[test]
-fn should_make_no_sound_when_guitar_is_plugged() {
-    let mut studio = Studio { instrument: None };
-    studio.plug(Guitar());
-    assert_eq!(true, studio.isGuitarPlugged());
-    assert_eq!(false, studio.makeSound());
+fn should_plug_guitar_in_sound_card() {
+    let mut sound_card = SoundCard { instrument: None };
+    sound_card.plug(Guitar());
+    assert_eq!(true, sound_card.isGuitarPlugged());
+}
+
+#[test]
+fn should_plug_sound_card_to_studio() {
+    let mut studio = Studio { soundcard: None };
+    let sound_card = SoundCard { instrument: None };
+    studio.plug(sound_card);
+    assert!(studio.isSoundcardPlugged());
+    assert!(!studio.makeSound());
 }
 
